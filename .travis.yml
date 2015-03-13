@@ -2,11 +2,11 @@ language: php
 
 matrix:
     include:
-        - php: 5.5
         - php: 5.6
+        - php: 7.0
         - php: hhvm-nightly
     allow_failures:
-        - php: 5.5
+        - php: 7.0
         - php: hhvm-nightly
     fast_finish: true
 
@@ -20,6 +20,6 @@ before_install:
 install:
     - composer --prefer-source install
 
-scripts:
+script:
     - vendor/bin/phpunit --exclude-group tty,benchmark,intl-data
     - vendor/bin/behat
