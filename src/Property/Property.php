@@ -8,6 +8,11 @@ abstract class Property
 
     private $propertyDelimiter = ":";
 
+    public function __construct()
+    {
+        $this->configure();
+    }
+
     protected function setPropertyName($propertyName)
     {
         $this->propertyName = $propertyName;

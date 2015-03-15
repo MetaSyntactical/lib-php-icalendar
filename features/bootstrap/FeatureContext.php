@@ -1,5 +1,6 @@
 <?php
 
+use Assert\Assertion;
 use Behat\Behat\Context\Context;
 use Behat\Behat\Context\SnippetAcceptingContext;
 use Behat\Behat\Tester\Exception\PendingException;
@@ -21,6 +22,11 @@ class FeatureContext implements Context, SnippetAcceptingContext
     private $calendars = array();
 
     /**
+     * @var Event[]
+     */
+    private $events = array();
+
+    /**
      * @var Serializer[]
      */
     private $serializer = array();
@@ -34,6 +40,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function __construct()
     {
+        ini_set('date.timezone', 'UTC');
     }
 
     /**
@@ -52,9 +59,9 @@ class FeatureContext implements Context, SnippetAcceptingContext
         if (!isset($this->calendars[$arg2])) {
             throw new DomainException("Missing calendar $arg2.");
         }
-        $this->calendars[$arg2]->addEvent(
-            new Event($arg1)
-        );
+
+        $this->events[$arg1] = new Event($arg1, new DateTime());
+        $this->calendars[$arg2]->addEvent($this->events[$arg1]);
     }
 
     /**
@@ -80,10 +87,32 @@ class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function iShouldGet(PyStringNode $string)
     {
-        var_dump($string->getStrings());
         $contents = stream_get_contents(end($this->serializer)->getStream());
-        var_dump($contents);
-        throw new PendingException();
+        Assertion::same($contents, $string->getRaw());
+    }
+
+    /**
+     * @Given the event :arg1 is a whole-day event
+     */
+    public function theEventIsAWholeDayEvent($arg1)
+    {
+        $this->events[$arg1]->setAllDayEvent(true);
+    }
+
+    /**
+     * @Given the event :arg1 starts on :arg2
+     */
+    public function theEventStartsOn($arg1, $arg2)
+    {
+        $this->events[$arg1]->setDateStart(new DateTime($arg2));
+    }
+
+    /**
+     * @Given the event :arg1 ends on :arg2
+     */
+    public function theEventEndsOn($arg1, $arg2)
+    {
+        $this->events[$arg1]->setDateEnd(new DateTime($arg2));
     }
 
 }

@@ -28,8 +28,15 @@ class ICalSerializer extends Serializer
     public function getStream()
     {
         $stream = fopen("php://temp", "rwb");
+        $first = true;
         foreach ($this->properties as $property) {
             /** @var Property $property */
+
+            if (!$first) {
+                fwrite($stream, "\n");
+            }
+            $first = false;
+
             fwrite($stream, $property->serialize());
         }
 

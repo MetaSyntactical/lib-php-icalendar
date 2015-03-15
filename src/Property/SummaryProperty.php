@@ -10,6 +10,8 @@ class SummaryProperty extends Property
 
     public function __construct($summaryText)
     {
+        $this->configure();
+
         $this->setSummaryText($summaryText);
     }
 
